@@ -226,7 +226,7 @@ def create_metadata(output, data, s, title, filename):
             {
                 "cid": int(comment.find(class_="comment-link").attrs.get("href")[5:]),
                 "parent_cid": parent_cid,
-                "content": comment.find(class_="comment_text").contents[0].strip(),
+                "content": comment.find(class_="user-submitted-links").text.strip(),
                 "username": comment.find(class_="comment_username").text,
                 "date": comment.find(class_="popup_date").attrs.get("title"),
             }
