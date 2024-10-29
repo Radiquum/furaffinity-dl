@@ -22,9 +22,9 @@ When downloading a folder make sure to put everything after **/folder/**, for ex
 
 ```help
 
-usage: furaffinity-dl.py [-h] [--cookies COOKIES] [--output OUTPUT_FOLDER] [--check] [--user-agent USER_AGENT] [--submissions] [--folder FOLDER] [--start START]
-                         [--stop STOP] [--redownload] [--interval INTERVAL] [--rating] [--filter] [--metadata] [--download DOWNLOAD] [--json-description] [--login]
-                         [--index]
+usage: furaffinity-dl.py [-h] [--cookies COOKIES] [--output OUTPUT_FOLDER] [--check] [--user-agent USER_AGENT] [--submissions] [--folder FOLDER] [--start START] [--stop STOP]
+                         [--redownload] [--interval INTERVAL] [--rating] [--filter] [--metadata] [--download DOWNLOAD] [--json-description] [--html-description] [--login]
+                         [--index] [--real-category] [--request-compress] [--check-file-size] [--disable-threading] [--num-threads NUM_THREADS] [--dry-run]
                          [username] [category]
 
 Downloads the entire gallery/scraps/folder/favorites of a furaffinity user, or your submissions notifications
@@ -46,7 +46,7 @@ options:
   --folder FOLDER, -f FOLDER
                         full path of the furaffinity gallery folder. for instance 123456/Folder-Name-Here
   --start START         page number to start from
-  --stop STOP           Page number to stop on. Specify the full URL after the username: for favorites pages (1234567890/next) or for submissions pages: (new~123456789@48)
+  --stop STOP           Page number to stop on. Specify the full URL after the username: for favorites pages (1234567890/next) or for submissions pages: (new~123456789@48)     
   --redownload, -rd     Redownload files that have been downloaded already
   --interval INTERVAL, -i INTERVAL
                         delay between downloading pages in seconds [default: 0]
@@ -54,22 +54,24 @@ options:
   --filter              enable submission filter
   --metadata, -m        enable metadata saving
   --download DOWNLOAD   download a specific submission by providing its id
-  --html-description, -hd
-                        download description as original html format, this won't work if json-description is enabled
   --json-description, -jd
                         download description as a JSON list
   --html-description, -hd
                         download description as original html format, this won't work if json-description is enabled
   --login               extract furaffinity cookies directly from your browser
   --index               create an index of downloaded files in an output folder
-  --real-category       this will download to its real category sub folder. it's useful when download favorites to avoid duplicate files
+  --real-category       this will download to the sub folder of its real category. it's useful when download favorites to avoid duplicate files
   --request-compress    enable request compress which may save some bandwidth, but less file can be check by content-length. Since images won't be compress by default, it won't take much side effect to disable it by default
   --check-file-size     check all files size when download, this will skip build-in archive
+  --disable-threading   disable multithreading download
+  --num-threads NUM_THREADS, -t NUM_THREADS
+                        how many threads will be used for parallel download [default: 3]
+  --dry-run, --dry      dry run (don't create folders and don't download files)
 
 Examples:
  python3 furaffinity-dl.py koul -> will download gallery of user koul
  python3 furaffinity-dl.py koul scraps -> will download scraps of user koul
- python3 furaffinity-dl.py mylafox favorites -> will download favorites of user mylafox 
+ python3 furaffinity-dl.py mylafox favorites -> will download favorites of user mylafox
 
 You can also download a several users in one go like this:
  python3 furaffinity-dl.py "koul radiquum mylafox" -> will download gallery of users koul -> radiquum -> mylafox
@@ -77,7 +79,7 @@ You can also provide a file with user names that are separated by a new line
 
 You can also log in to FurAffinity in a web browser and load cookies to download age restricted content or submissions:
  python3 furaffinity-dl.py letodoesart -c cookies.txt -> will download gallery of user letodoesart including Mature and Adult submissions
- python3 furaffinity-dl.py --submissions -c cookies.txt -> will download your submissions notifications 
+ python3 furaffinity-dl.py --submissions -c cookies.txt -> will download your submissions notifications
 
 DISCLAIMER: It is your own responsibility to check whether batch downloading is allowed by FurAffinity terms of service and to abide by them.
 

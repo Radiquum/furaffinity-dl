@@ -182,7 +182,7 @@ parser.add_argument(
     "--dry",
     dest="dry_run",
     action="store_true",
-    help="disable multithreading download",
+    help="dry run (don't create folders and don't download files)",
 )
 
 args = parser.parse_args()
