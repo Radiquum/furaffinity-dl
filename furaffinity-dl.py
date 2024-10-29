@@ -82,16 +82,19 @@ it\'s already downloaded{config.END}'
                     )
                     continue
 
-                #download(img_url)
-                q.put(img_url)
+                if config.disable_threading:
+                    download(img_url)
+                else:
+                    q.put(img_url)
                 sleep(config.interval)
             q.join()
             page_num = next_button(page_url)
-    stop_threads = True
-    for _ in range(3):
-        q.put("shutdown")
-    for t in workers:
-        t.join()
+    if not config.disable_threading:
+        stop_threads = True
+        for _ in range(config.num_threads):
+            q.put("shutdown")
+        for t in workers:
+            t.join()
 
 
 if __name__ == "__main__":
@@ -125,13 +128,14 @@ is inaccessible{config.END}"
     if config.download is not None:
         download(f"/view/{config.download}/")
         exit()
-        
-    stop_threads = False
-    for id in range(3):
-        print(id, 'started thread')
-        tmp = threading.Thread(target=worker, daemon=False)
-        workers.append(tmp)
-        tmp.start()
+
+    if not config.disable_threading:
+        stop_threads = False
+        for id in range(config.num_threads):
+            print(id, 'started thread')
+            tmp = threading.Thread(target=worker, daemon=False)
+            workers.append(tmp)
+            tmp.start()
 
     if config.submissions is True:
         download_url = f"{config.BASE_URL}/msg/submissions"
@@ -159,6 +163,11 @@ downloading "{config.folder[1]}"{config.END}'
             f"{config.ERROR_COLOR}Please enter a valid category [gallery/scraps/favorites] {config.END}"
         )
         exit()
+
+    if not config.username:
+        print("Not enough arguments")
+        config.parser.print_help()
+        os._exit(1)
 
     for username in config.username:
         username = username.split("#")[0].translate(

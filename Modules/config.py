@@ -163,6 +163,20 @@ parser.add_argument(
     action="store_true",
     help="check all files size when download, this will skip build-in archive",
 )
+parser.add_argument(
+    "--disable-threading",
+    dest="disable_threading",
+    action="store_true",
+    help="disable multithreading download",
+)
+parser.add_argument(
+    "--num-threads",
+    "-t",
+    dest="num_threads",
+    default=3,
+    help="how many threads will be used for parallel download [default: 3]",
+    type=int,
+)
 
 args = parser.parse_args()
 
@@ -181,30 +195,32 @@ if username is not None:
         username = username[0]
 
 # Custom input
-cookies = args.cookies
-output_folder = args.output_folder
-download = args.download
-interval = args.interval
-user_agent = args.user_agent
-start = args.start
-stop = args.stop
-folder = args.folder
+cookies: str = args.cookies
+output_folder: str = args.output_folder
+download: int = args.download
+interval: int = args.interval
+user_agent: str = args.user_agent
+start: int = args.start
+stop: int = args.stop
+folder: str = args.folder
+num_threads: int = args.num_threads
 
 # True\False
 
-login = args.login
-check = args.check
-index = args.index
-submissions = args.submissions
-html_description = args.html_description
-json_description = args.json_description
-metadata = args.metadata
-dont_redownload = args.redownload
-rating = args.rating
-submission_filter = args.submission_filter
-real_category = args.real_category
-request_compress = args.request_compress
-check_file_size = args.check_file_size
+login: bool = args.login
+check: bool = args.check
+index: bool = args.index
+submissions: bool = args.submissions
+html_description: bool = args.html_description
+json_description: bool = args.json_description
+metadata: bool = args.metadata
+dont_redownload: bool = args.redownload
+rating: bool = args.rating
+submission_filter: bool = args.submission_filter
+real_category: bool = args.real_category
+request_compress: bool = args.request_compress
+check_file_size: bool = args.check_file_size
+disable_threading: bool = args.disable_threading
 
 if check_file_size:
     request_compress = False
