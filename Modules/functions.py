@@ -133,33 +133,17 @@ def next_button(page_url):
         else:
             print(f"{config.WARN_COLOR}Unable to find next button{config.END}")
             raise DownloadComplete
-    elif config.category != "favorites":
+    else:
         parse_next_button = s.find("button", class_="button standard", text="Next")
         if parse_next_button is None or parse_next_button.parent is None:
             print(f"{config.WARN_COLOR}Unable to find next button{config.END}")
             raise DownloadComplete
-        page_num = parse_next_button.parent.attrs["action"].split("/")[-2]
-    else:
-        parse_next_button = s.find("a", class_="button standard right", text="Next")
-        page_num = fav_next_button(parse_next_button)
+        if config.category != "favorites":
+            page_num = parse_next_button.parent.attrs["action"].split("/")[-2]
+        else:
+            page_num = f"{parse_next_button.parent.attrs["action"].split("/")[-2]}/next"
 
     print(
         f"Downloading page {page_num}"
     )
     return page_num
-
-
-def fav_next_button(parse_next_button):
-    # unlike galleries that are sequentially numbered, favorites use a different scheme.
-    # the "page_num" is instead: [set of numbers]/next (the trailing /next is required)
-    if parse_next_button is None:
-        print(f"{config.WARN_COLOR}Unable to find next button{config.END}")
-        raise DownloadComplete
-    next_page_link = parse_next_button.attrs["href"]
-    next_fav_num = re.findall(r"\d+", next_page_link)
-
-    if len(next_fav_num) <= 0:
-        print(f"{config.WARN_COLOR}Failed to parse next favorite link{config.END}")
-        raise DownloadComplete
-
-    return f"{next_fav_num[-1]}/next"

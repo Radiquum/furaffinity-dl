@@ -12,7 +12,7 @@ from Modules.functions import system_message_handler
 
 
 def download(path, max_retries=5):
-    if max_retries < 0:
+    if max_retries <= 0:
         return False
     try:
         response = requests_retry_session().get(f"{config.BASE_URL}{path}")
@@ -28,6 +28,11 @@ def download(path, max_retries=5):
             f"{config.ERROR_COLOR}unsuccessful download of {config.BASE_URL}{path} remains retries {max_retries}{config.END}"
         )
         return download(path, max_retries - 1)
+    except DownloadComplete:
+        print(
+            f"{config.ERROR_COLOR}unsuccessful download of {config.BASE_URL}{path}. Maybe you need to log in?{config.END}"
+        )
+        return False
     except Exception as e:
         print(f"{config.ERROR_COLOR}exception when download {config.BASE_URL}{path} remains retries {max_retries}, error {e}{config.END}")
         return download(path, max_retries - 1)
