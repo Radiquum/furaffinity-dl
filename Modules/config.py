@@ -177,6 +177,13 @@ parser.add_argument(
     help="how many threads will be used for parallel download [default: 3]",
     type=int,
 )
+parser.add_argument(
+    "--dry-run",
+    "--dry",
+    dest="dry_run",
+    action="store_true",
+    help="disable multithreading download",
+)
 
 args = parser.parse_args()
 
@@ -221,6 +228,7 @@ real_category: bool = args.real_category
 request_compress: bool = args.request_compress
 check_file_size: bool = args.check_file_size
 disable_threading: bool = args.disable_threading
+dry_run: bool = args.dry_run
 
 if check_file_size:
     request_compress = False

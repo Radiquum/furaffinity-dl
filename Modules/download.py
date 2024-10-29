@@ -18,7 +18,7 @@ def download(path, max_retries=5):
         response = requests_retry_session().get(f"{config.BASE_URL}{path}")
 
         s = BeautifulSoup(response.text, "html.parser")
-        
+
         # System messages
         if s.find(class_="notice-message") is not None:
             system_message_handler(s)
@@ -49,50 +49,52 @@ def download(path, max_retries=5):
     output = f"{config.output_folder}/{author}"
     rating = s.find(class_="rating-box").text.strip()
 
-    if config.real_category:
-        real_category = get_image_cateory(s)
-        output = f"{config.output_folder}/{author}/{real_category}"
-    else: 
-        if config.category != "gallery":
-            output = f"{config.output_folder}/{author}/{config.category}"
-        if config.folder is not None:
-            output = f"{config.output_folder}/{author}/folders/{config.folder.split('/')[1]}"
-    os.makedirs(output, exist_ok=True)
-
-    output_path = f"{output}/{title} ({view_id}) - {filename}"
-    output_path_fb = f"{output}/{title} - {filename}"
-    if config.rating is True:
-        os.makedirs(f"{output}/{rating}", exist_ok=True)
-        output_path = f"{output}/{rating}/{title} ({view_id}) - {filename}"
-        output_path_fb = f"{output}/{rating}/{title} - {filename}"
-
     image_url = f"https:{image}"
 
-    if config.check_file_size and (
+    if not config.dry_run:
+        if config.real_category:
+            real_category = get_image_cateory(s)
+            output = f"{config.output_folder}/{author}/{real_category}"
+        else:
+            if config.category != "gallery":
+                output = f"{config.output_folder}/{author}/{config.category}"
+            if config.folder is not None:
+                output = f"{config.output_folder}/{author}/folders/{config.folder.split('/')[1]}"
+        os.makedirs(output, exist_ok=True)
+
+        output_path = f"{output}/{title} ({view_id}) - {filename}"
+        output_path_fb = f"{output}/{title} - {filename}"
+        if config.rating is True:
+            os.makedirs(f"{output}/{rating}", exist_ok=True)
+            output_path = f"{output}/{rating}/{title} ({view_id}) - {filename}"
+            output_path_fb = f"{output}/{rating}/{title} - {filename}"
+
+        if config.check_file_size and (
         os.path.isfile(output_path_fb) or os.path.isfile(output_path)
-    ):
-        content_length = get_content_length(image_url)
-        delete_file_if_mismatch_size(output_path_fb, content_length)
-        delete_file_if_mismatch_size(output_path, content_length)
+        ):
+            content_length = get_content_length(image_url)
+            delete_file_if_mismatch_size(output_path_fb, content_length)
+            delete_file_if_mismatch_size(output_path, content_length)
 
+        if config.dont_redownload is True and (
+            os.path.isfile(output_path_fb) or os.path.isfile(output_path)
+        ):
+            return file_exists_fallback(author, title, view_id)
 
-    if config.dont_redownload is True and (
-        os.path.isfile(output_path_fb) or os.path.isfile(output_path)
-    ):
-        return file_exists_fallback(author, title, view_id)
-
-    if (
+        if (
         download_file(
             image_url, f"{config.BASE_URL}{path}", output_path, f"{title} - [{rating}]"
         )
         is True
-    ):
-        with open(
-            f"{config.output_folder}/index.idx", encoding="utf-8", mode="a+"
-        ) as idx:
-            idx.write(f"({view_id})\n")
+        ):
+            with open(
+                f"{config.output_folder}/index.idx", encoding="utf-8", mode="a+"
+            ) as idx:
+                idx.write(f"({view_id})\n")
+        else:
+            return download(path, max_retries - 1)
     else:
-        return download(path, max_retries - 1)
+        print(f"{config.SUCCESS_COLOR}[DRY] Found Submission: {title} - [{rating}]{config.END}")
 
     if config.metadata is True:
         if config.html_description is True:
@@ -125,7 +127,6 @@ def download(path, max_retries=5):
             f'{config.SUCCESS_COLOR}File saved as \
 "{output_path}" {config.END}'
         )
-
     return True
 
 
