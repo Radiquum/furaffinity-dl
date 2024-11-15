@@ -141,7 +141,7 @@ def next_button(page_url):
         if config.category != "favorites":
             page_num = parse_next_button.parent.attrs["action"].split("/")[-2]
         else:
-            page_num = f"{parse_next_button.parent.attrs["action"].split("/")[-2]}/next"
+            page_num = f"{parse_next_button.parent.attrs['action'].split('/')[-2]}/next"
 
     print(
         f"Downloading page {page_num}"
